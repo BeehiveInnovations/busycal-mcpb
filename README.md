@@ -5,7 +5,7 @@ BusyCal for Claude is distributed as a signed `.mcpb` bundle through GitHub Rele
 ## Install
 
 1. Open the latest release from this repository.
-2. Download `busycal.0.1.0.mcpb`.
+2. Download the BusyCal MCP bundle asset from that release.
 3. Open the bundle in Claude Desktop.
 
 ## What It Does
