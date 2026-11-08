@@ -1,0 +1,7 @@
+{
+  "mcpServers": {
+    "busycal": {
+      "command": "${CLAUDE_PLUGIN_ROOT}/server/BusyCalMCPBridge"
+    }
+  }
+}

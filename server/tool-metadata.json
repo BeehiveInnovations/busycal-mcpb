@@ -1,0 +1,2711 @@
+{
+  "tools": [
+    {
+      "commandName": "listAccounts",
+      "toolName": "list_accounts",
+      "title": "List BusyCal Accounts",
+      "description": "List the user's BusyCal calendar accounts. Returns account names, types, and enabled state. Only enabled accounts are returned by default.",
+      "resultDescription": "Account records.",
+      "annotations": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "parameters": [
+        {
+          "name": "includeDisabled",
+          "key": "includeDisabled",
+          "acceptedKeys": [],
+          "description": "Include disabled accounts when true.",
+          "required": false,
+          "schema": {
+            "type": "boolean"
+          },
+          "transport": null
+        }
+      ]
+    },
+    {
+      "commandName": "listCalendars",
+      "toolName": "list_calendars",
+      "title": "List BusyCal Calendars",
+      "description": "List the user's BusyCal calendars. Returns calendar names, IDs, and whether each supports events or tasks. Can filter by account and exclude subscription, holiday, or birthday calendars.",
+      "resultDescription": "Calendar records.",
+      "annotations": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "parameters": [
+        {
+          "name": "accountID",
+          "key": "accountID",
+          "acceptedKeys": [],
+          "description": "Optional account identifier filter.",
+          "required": false,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        },
+        {
+          "name": "includeDisabledAccounts",
+          "key": "includeDisabledAccounts",
+          "acceptedKeys": [],
+          "description": "Include calendars from disabled accounts when true.",
+          "required": false,
+          "schema": {
+            "type": "boolean"
+          },
+          "transport": null
+        },
+        {
+          "name": "includeWebDAV",
+          "key": "includeWebDAV",
+          "acceptedKeys": [],
+          "description": "Include WebDAV subscription calendars when true.",
+          "required": false,
+          "schema": {
+            "type": "boolean"
+          },
+          "transport": null
+        },
+        {
+          "name": "includeContactCalendars",
+          "key": "includeContactCalendars",
+          "acceptedKeys": [],
+          "description": "Include birthday and anniversary calendars when true.",
+          "required": false,
+          "schema": {
+            "type": "boolean"
+          },
+          "transport": null
+        },
+        {
+          "name": "includeHolidayCalendars",
+          "key": "includeHolidayCalendars",
+          "acceptedKeys": [],
+          "description": "Include holiday calendars when true.",
+          "required": false,
+          "schema": {
+            "type": "boolean"
+          },
+          "transport": null
+        }
+      ]
+    },
+    {
+      "commandName": "listCalendarSets",
+      "toolName": "list_calendar_sets",
+      "title": "List BusyCal Calendar Sets",
+      "description": "List the user's saved BusyCal calendar sets, which are named selections of calendars the user switches between to filter the view. Each record returns `id`, `title`, `calendarIDs`, and `sortOrder`, with the built-in All Calendars set first and the rest in the user's own order. The `calendarIDs` match the calendar ids returned by `list_calendars`, so they can be used to narrow a later query to one set's calendars. This tool is read-only, takes no parameters, and omits calendar sets the user has locked.",
+      "resultDescription": "Calendar set records.",
+      "annotations": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "parameters": []
+    },
+    {
+      "commandName": "selectedItems",
+      "toolName": "selected_items",
+      "title": "Get BusyCal Selected Items",
+      "description": "Return the events, tasks, or other items currently selected in BusyCal's main window. Records use the same unified shape as `query_items` (event, task, journal, graphic, or sticky fields with field-specific timezone identifiers when BusyCal stores fixed-time zone data), so the returned `id` values can be passed straight into update, move, defer, complete, duplicate, or delete tools without re-querying by text or date. Returns an empty list when nothing is selected.",
+      "resultDescription": "Selected item records using the same shape as query items.",
+      "annotations": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "parameters": []
+    },
+    {
+      "commandName": "getItem",
+      "toolName": "get_item",
+      "title": "Get BusyCal Item",
+      "description": "Fetch one BusyCal item by its canonical occurrence identifier. Use the `id` returned by `query_items`, `query_events`, `query_tasks`, or `selected_items` to re-read that item without searching for it again. Returns the same unified record shape as `query_items` (event, task, journal, graphic, or sticky fields, with field-specific timezone identifiers when BusyCal stores fixed-time zone data), and reports an error when no item matches the identifier.",
+      "resultDescription": "Item record using the same shape as query items.",
+      "annotations": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "parameters": [
+        {
+          "name": "itemID",
+          "key": "itemID",
+          "acceptedKeys": [
+            "id"
+          ],
+          "description": "Canonical occurrence identifier returned by BusyCal query tools, such as `query_items`, `query_events`, `query_tasks`, or `selected_items`.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        }
+      ]
+    },
+    {
+      "commandName": "queryItems",
+      "toolName": "query_items",
+      "title": "Query BusyCal Items",
+      "description": "Search across events, tasks, journals, graphics, and stickies in BusyCal. Filter by keyword, date range, calendar, item type, or search field. Returns matching items with absolute date fields plus field-specific timezone identifiers such as `occurrenceTimeZoneIdentifier`, `startTimeZoneIdentifier`, `endTimeZoneIdentifier`, and `dueTimeZoneIdentifier` when BusyCal stores fixed-time zone data. If `isFloating` is true and those timezone fields are absent, treat the returned wall-clock values as floating and do not reinterpret them through the operator locale.",
+      "resultDescription": "Unified item records with absolute dates plus matching field-specific timezone identifiers when BusyCal stores fixed-time zone data. Floating items omit those timezone fields and should be treated as floating wall-clock values.",
+      "annotations": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "parameters": [
+        {
+          "name": "searchText",
+          "key": "searchText",
+          "acceptedKeys": [],
+          "description": "Optional full-text query.",
+          "required": false,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        },
+        {
+          "name": "calendarID",
+          "key": "calendarID",
+          "acceptedKeys": [],
+          "description": "Optional calendar identifier filter.",
+          "required": false,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        },
+        {
+          "name": "startDate",
+          "key": "startDate",
+          "acceptedKeys": [],
+          "description": "Optional query lower date bound. When omitted but endDate is supplied, BusyCal uses the current time as the effective lower bound.",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "format": "busycal-date"
+          },
+          "transport": null
+        },
+        {
+          "name": "endDate",
+          "key": "endDate",
+          "acceptedKeys": [],
+          "description": "Optional query upper date bound. Leave empty for an open-ended search from startDate onward.",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "format": "busycal-date"
+          },
+          "transport": null
+        },
+        {
+          "name": "itemTypes",
+          "key": "itemTypes",
+          "acceptedKeys": [],
+          "description": "Optional comma-separated item types: event, task, journal, graphic, sticky.",
+          "required": false,
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "event",
+                "task",
+                "journal",
+                "graphic",
+                "sticky"
+              ]
+            }
+          },
+          "transport": {
+            "array": "csv"
+          }
+        },
+        {
+          "name": "searchFields",
+          "key": "searchFields",
+          "acceptedKeys": [],
+          "description": "Optional comma-separated search fields: title, notes, tags.",
+          "required": false,
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "title",
+                "notes",
+                "tags"
+              ]
+            }
+          },
+          "transport": {
+            "array": "csv"
+          }
+        },
+        {
+          "name": "mode",
+          "key": "mode",
+          "acceptedKeys": [],
+          "description": "Query mode: uiConsistent or rawExhaustive.",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "uiConsistent",
+              "rawExhaustive"
+            ]
+          },
+          "transport": null
+        },
+        {
+          "name": "fetchLimit",
+          "key": "fetchLimit",
+          "acceptedKeys": [],
+          "description": "Optional maximum result count.",
+          "required": false,
+          "schema": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "transport": null
+        },
+        {
+          "name": "offset",
+          "key": "offset",
+          "acceptedKeys": [],
+          "description": "Optional number of matching rows to skip after filtering and ordering.",
+          "required": false,
+          "schema": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "transport": null
+        }
+      ]
+    },
+    {
+      "commandName": "queryEvents",
+      "toolName": "query_events",
+      "title": "Query BusyCal Events",
+      "description": "Search BusyCal events by keyword, date range, or calendar. Returns absolute `startDate` and `endDate` values together with `startTimeZoneIdentifier` and `endTimeZoneIdentifier` when BusyCal stores fixed-time zone data. If `isFloating` is true and those timezone fields are absent, treat the returned wall-clock values as floating and do not reinterpret them through the operator locale.",
+      "resultDescription": "Event records with absolute dates plus matching timezone identifiers when BusyCal stores fixed-time zone data. Floating events omit those timezone fields and should be treated as floating wall-clock values.",
+      "annotations": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "parameters": [
+        {
+          "name": "searchText",
+          "key": "searchText",
+          "acceptedKeys": [],
+          "description": "Optional full-text query.",
+          "required": false,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        },
+        {
+          "name": "calendarID",
+          "key": "calendarID",
+          "acceptedKeys": [],
+          "description": "Optional calendar identifier filter.",
+          "required": false,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        },
+        {
+          "name": "startDate",
+          "key": "startDate",
+          "acceptedKeys": [],
+          "description": "Optional query lower date bound. When omitted but endDate is supplied, BusyCal uses the current time as the effective lower bound.",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "format": "busycal-date"
+          },
+          "transport": null
+        },
+        {
+          "name": "endDate",
+          "key": "endDate",
+          "acceptedKeys": [],
+          "description": "Optional query upper date bound. Leave empty for an open-ended search from startDate onward.",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "format": "busycal-date"
+          },
+          "transport": null
+        },
+        {
+          "name": "searchFields",
+          "key": "searchFields",
+          "acceptedKeys": [],
+          "description": "Optional comma-separated search fields: title, notes, tags.",
+          "required": false,
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "title",
+                "notes",
+                "tags"
+              ]
+            }
+          },
+          "transport": {
+            "array": "csv"
+          }
+        },
+        {
+          "name": "mode",
+          "key": "mode",
+          "acceptedKeys": [],
+          "description": "Query mode: uiConsistent or rawExhaustive.",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "uiConsistent",
+              "rawExhaustive"
+            ]
+          },
+          "transport": null
+        },
+        {
+          "name": "fetchLimit",
+          "key": "fetchLimit",
+          "acceptedKeys": [],
+          "description": "Optional maximum result count.",
+          "required": false,
+          "schema": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "transport": null
+        },
+        {
+          "name": "offset",
+          "key": "offset",
+          "acceptedKeys": [],
+          "description": "Optional number of matching rows to skip after filtering and ordering.",
+          "required": false,
+          "schema": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "transport": null
+        }
+      ]
+    },
+    {
+      "commandName": "queryTasks",
+      "toolName": "query_tasks",
+      "title": "Query BusyCal Tasks",
+      "description": "Search BusyCal tasks by keyword, date range, or calendar. Returns absolute `dueDate` values together with `dueTimeZoneIdentifier` when BusyCal stores fixed-time zone data. If `isFloating` is true and that timezone field is absent, treat the returned wall-clock value as floating and do not reinterpret it through the operator locale.",
+      "resultDescription": "Task records with absolute dates plus matching timezone identifiers when BusyCal stores fixed-time zone data. Floating tasks omit those timezone fields and should be treated as floating wall-clock values.",
+      "annotations": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "parameters": [
+        {
+          "name": "searchText",
+          "key": "searchText",
+          "acceptedKeys": [],
+          "description": "Optional full-text query.",
+          "required": false,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        },
+        {
+          "name": "calendarID",
+          "key": "calendarID",
+          "acceptedKeys": [],
+          "description": "Optional calendar identifier filter.",
+          "required": false,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        },
+        {
+          "name": "startDate",
+          "key": "startDate",
+          "acceptedKeys": [],
+          "description": "Optional query lower date bound. When omitted but endDate is supplied, BusyCal uses the current time as the effective lower bound.",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "format": "busycal-date"
+          },
+          "transport": null
+        },
+        {
+          "name": "endDate",
+          "key": "endDate",
+          "acceptedKeys": [],
+          "description": "Optional query upper date bound. Leave empty for an open-ended search from startDate onward.",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "format": "busycal-date"
+          },
+          "transport": null
+        },
+        {
+          "name": "searchFields",
+          "key": "searchFields",
+          "acceptedKeys": [],
+          "description": "Optional comma-separated search fields: title, notes, tags.",
+          "required": false,
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "title",
+                "notes",
+                "tags"
+              ]
+            }
+          },
+          "transport": {
+            "array": "csv"
+          }
+        },
+        {
+          "name": "mode",
+          "key": "mode",
+          "acceptedKeys": [],
+          "description": "Query mode: uiConsistent or rawExhaustive.",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "uiConsistent",
+              "rawExhaustive"
+            ]
+          },
+          "transport": null
+        },
+        {
+          "name": "fetchLimit",
+          "key": "fetchLimit",
+          "acceptedKeys": [],
+          "description": "Optional maximum result count.",
+          "required": false,
+          "schema": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "transport": null
+        },
+        {
+          "name": "offset",
+          "key": "offset",
+          "acceptedKeys": [],
+          "description": "Optional number of matching rows to skip after filtering and ordering.",
+          "required": false,
+          "schema": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "transport": null
+        }
+      ]
+    },
+    {
+      "commandName": "queryAvailability",
+      "toolName": "query_availability",
+      "title": "Query BusyCal Availability",
+      "description": "Show free and busy time slots for a date range in BusyCal. Returns per-day breakdowns with absolute `date`, `windowStartDate`, `windowEndDate`, `startDate`, and `endDate` values. Each day and span also includes BusyCal's active `timeZoneIdentifier`; interpret those startDate/endDate values in that timezoneIdentifier rather than reinterpreting them through the operator locale. Can filter by calendar and respect working hours.",
+      "resultDescription": "Per-day availability records, each including absolute dates and BusyCal's active timeZoneIdentifier for interpretation.",
+      "annotations": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "parameters": [
+        {
+          "name": "startDate",
+          "key": "startDate",
+          "acceptedKeys": [],
+          "description": "Optional availability lower bound. Defaults to today.",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "format": "busycal-date"
+          },
+          "transport": null
+        },
+        {
+          "name": "endDate",
+          "key": "endDate",
+          "acceptedKeys": [],
+          "description": "Optional availability upper bound. Defaults to the same day as startDate when omitted.",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "format": "busycal-date"
+          },
+          "transport": null
+        },
+        {
+          "name": "calendarIDs",
+          "key": "calendarIDs",
+          "acceptedKeys": [],
+          "description": "Optional comma-separated calendar identifiers. When omitted, BusyCal uses its default availability scope.",
+          "required": false,
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "transport": {
+            "array": "csv"
+          }
+        },
+        {
+          "name": "kind",
+          "key": "kind",
+          "acceptedKeys": [],
+          "description": "Availability payload kind: free, busy, or both.",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "free",
+              "busy",
+              "both"
+            ]
+          },
+          "transport": null
+        },
+        {
+          "name": "minimumDurationMinutes",
+          "key": "minimumDurationMinutes",
+          "acceptedKeys": [],
+          "description": "Optional minimum free-span duration in minutes.",
+          "required": false,
+          "schema": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "transport": null
+        },
+        {
+          "name": "respectWorkingHours",
+          "key": "respectWorkingHours",
+          "acceptedKeys": [],
+          "description": "Use BusyCal's configured day start/day end and working days when true.",
+          "required": false,
+          "schema": {
+            "type": "boolean"
+          },
+          "transport": null
+        },
+        {
+          "name": "busyTypes",
+          "key": "busyTypes",
+          "acceptedKeys": [],
+          "description": "Optional comma-separated blocking states: busy, tentative, outOfOffice, workingElsewhere, unknown.",
+          "required": false,
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "busy",
+                "tentative",
+                "outOfOffice",
+                "workingElsewhere",
+                "unknown"
+              ]
+            }
+          },
+          "transport": {
+            "array": "csv"
+          }
+        },
+        {
+          "name": "mode",
+          "key": "mode",
+          "acceptedKeys": [],
+          "description": "Query mode: uiConsistent or rawExhaustive.",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "uiConsistent",
+              "rawExhaustive"
+            ]
+          },
+          "transport": null
+        }
+      ]
+    },
+    {
+      "commandName": "findNextAvailable",
+      "toolName": "find_next_available",
+      "title": "Find Next BusyCal Availability",
+      "description": "Find the next free time slot in BusyCal that is at least a given number of minutes long. Returns absolute `startDate` and `endDate` values plus BusyCal's active `timeZoneIdentifier`; interpret those startDate/endDate values in that timezoneIdentifier rather than reinterpreting them through the operator locale. Can filter by calendar and respect working hours.",
+      "resultDescription": "The first matching free interval plus BusyCal's active timeZoneIdentifier, or missing value when no interval exists.",
+      "annotations": {
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "parameters": [
+        {
+          "name": "startDate",
+          "key": "startDate",
+          "acceptedKeys": [],
+          "description": "Optional availability lower bound. Defaults to now.",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "format": "busycal-date"
+          },
+          "transport": null
+        },
+        {
+          "name": "endDate",
+          "key": "endDate",
+          "acceptedKeys": [],
+          "description": "Optional availability upper bound. Defaults to the end of the seventh day from startDate when omitted.",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "format": "busycal-date"
+          },
+          "transport": null
+        },
+        {
+          "name": "calendarIDs",
+          "key": "calendarIDs",
+          "acceptedKeys": [],
+          "description": "Optional comma-separated calendar identifiers. When omitted, BusyCal uses its default availability scope.",
+          "required": false,
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "transport": {
+            "array": "csv"
+          }
+        },
+        {
+          "name": "minimumDurationMinutes",
+          "key": "minimumDurationMinutes",
+          "acceptedKeys": [],
+          "description": "Minimum qualifying free-span duration in minutes.",
+          "required": false,
+          "schema": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "transport": null
+        },
+        {
+          "name": "respectWorkingHours",
+          "key": "respectWorkingHours",
+          "acceptedKeys": [],
+          "description": "Use BusyCal's configured day start/day end and working days when true.",
+          "required": false,
+          "schema": {
+            "type": "boolean"
+          },
+          "transport": null
+        },
+        {
+          "name": "busyTypes",
+          "key": "busyTypes",
+          "acceptedKeys": [],
+          "description": "Optional comma-separated blocking states: busy, tentative, outOfOffice, workingElsewhere, unknown.",
+          "required": false,
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "busy",
+                "tentative",
+                "outOfOffice",
+                "workingElsewhere",
+                "unknown"
+              ]
+            }
+          },
+          "transport": {
+            "array": "csv"
+          }
+        },
+        {
+          "name": "mode",
+          "key": "mode",
+          "acceptedKeys": [],
+          "description": "Query mode: uiConsistent or rawExhaustive.",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "uiConsistent",
+              "rawExhaustive"
+            ]
+          },
+          "transport": null
+        }
+      ]
+    },
+    {
+      "commandName": "createNaturalLanguageItem",
+      "toolName": "create_natural_language_item",
+      "title": "Create BusyCal Item from Natural Language",
+      "description": "Create an event, task, or journal through BusyCal's natural-language quick-entry parser. Provide the quick-entry text and the intended item type. Optional notes and calendar selection are applied after parsing.",
+      "resultDescription": "Created item record.",
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "parameters": [
+        {
+          "name": "text",
+          "key": "text",
+          "acceptedKeys": [],
+          "description": "Natural-language quick-entry text such as \"Lunch with John tomorrow at 2pm\" or \"Finish report tomorrow\".",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        },
+        {
+          "name": "itemType",
+          "key": "itemType",
+          "acceptedKeys": [],
+          "description": "Requested item type: event, task, or journal.",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "event",
+              "task",
+              "journal"
+            ]
+          },
+          "transport": null
+        },
+        {
+          "name": "calendarID",
+          "key": "calendarID",
+          "acceptedKeys": [],
+          "description": "Optional target calendar identifier. When omitted, BusyCal uses its default calendar for the requested item type.",
+          "required": false,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        },
+        {
+          "name": "notes",
+          "key": "notes",
+          "acceptedKeys": [],
+          "description": "Optional notes content applied after parsing.",
+          "required": false,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        }
+      ]
+    },
+    {
+      "commandName": "createEvent",
+      "toolName": "create_event",
+      "title": "Create BusyCal Event",
+      "description": "Create a new event in BusyCal. Requires a title and start date. Supports optional end date, location, travel time, all-day flag, reminders, calendar selection, notes, and explicit IANA time zone identifiers. To place a timed event in a specific time zone, send an unzoned wall-clock `startDate` (no offset) together with `startTimeZoneIdentifier`; do the same with `endDate` and `endTimeZoneIdentifier` when the end zone differs. Omit the timezone identifiers to use BusyCal's current app time zone. For all-day events, send date-only values such as `2026-04-14`; when the event should run through a final day, pass that day as `endDate` and BusyCal expands its exclusive internal end boundary automatically. Only include `alarms` when the user explicitly asked for reminders.",
+      "resultDescription": "Created event record.",
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "parameters": [
+        {
+          "name": "title",
+          "key": "title",
+          "acceptedKeys": [],
+          "description": "Event title.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        },
+        {
+          "name": "startDate",
+          "key": "startDate",
+          "acceptedKeys": [],
+          "description": "Required event start date/time. Use a date-only value like `2026-04-14` for all-day events, or an unzoned wall-clock string like `2026-04-14T14:00:00` for timed input. Pair timed string inputs with `startTimeZoneIdentifier` when the event should use a specific named time zone.",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "busycal-date"
+          },
+          "transport": null
+        },
+        {
+          "name": "endDate",
+          "key": "endDate",
+          "acceptedKeys": [],
+          "description": "Optional event end date/time. Use an unzoned wall-clock string for timed input and pair it with `endTimeZoneIdentifier` when needed. For all-day events, a date-only value is interpreted as the inclusive final day, so `startDate: 2026-04-14` and `endDate: 2026-04-19` creates an event running through April 19.",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "format": "busycal-date"
+          },
+          "transport": null
+        },
+        {
+          "name": "startTimeZoneIdentifier",
+          "key": "startTimeZoneIdentifier",
+          "acceptedKeys": [],
+          "description": "IANA time zone identifier for the timed `startDate`, such as `America/Los_Angeles` or `US/Eastern`. When present, the `startDate` string must be an unzoned wall-clock value (no offset). Omit to use BusyCal's current app time zone.",
+          "required": false,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        },
+        {
+          "name": "endTimeZoneIdentifier",
+          "key": "endTimeZoneIdentifier",
+          "acceptedKeys": [],
+          "description": "IANA time zone identifier for the timed `endDate`, such as `America/New_York` or `US/Mountain`. When present, the `endDate` string must be an unzoned wall-clock value (no offset). Omit to use BusyCal's current app time zone. Requires `endDate`.",
+          "required": false,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        },
+        {
+          "name": "calendarID",
+          "key": "calendarID",
+          "acceptedKeys": [],
+          "description": "Optional target calendar identifier.",
+          "required": false,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        },
+        {
+          "name": "allDay",
+          "key": "allDay",
+          "acceptedKeys": [],
+          "description": "Whether the event is all-day. For all-day events, prefer date-only startDate/endDate values.",
+          "required": false,
+          "schema": {
+            "type": "boolean"
+          },
+          "transport": null
+        },
+        {
+          "name": "location",
+          "key": "location",
+          "acceptedKeys": [],
+          "description": "Optional event location. Pass either a plain string or an object with keys such as title, address, latitude, and longitude.",
+          "required": false,
+          "schema": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "address": {
+                    "type": "string"
+                  },
+                  "latitude": {
+                    "type": "number"
+                  },
+                  "longitude": {
+                    "type": "number"
+                  }
+                }
+              }
+            ]
+          },
+          "transport": null
+        },
+        {
+          "name": "travelTime",
+          "key": "travelTime",
+          "acceptedKeys": [],
+          "description": "Optional travel time in whole minutes before the event starts. Use 0 for no travel time. All-day events and Apple Calendar accounts do not support this field.",
+          "required": false,
+          "schema": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "transport": null
+        },
+        {
+          "name": "alarms",
+          "key": "alarms",
+          "acceptedKeys": [],
+          "description": "Optional list of signed relative reminder minutes. Include this field only when the user explicitly requested reminders. Use `[]` to create the event with no reminders. Omit `alarms` so BusyCal keeps its own defaults. For example, `[-60, -15]` creates reminders 60 and 15 minutes before the event.",
+          "required": false,
+          "schema": {
+            "type": "array",
+            "maxItems": 4,
+            "items": {
+              "type": "integer"
+            }
+          },
+          "transport": null
+        },
+        {
+          "name": "recurrence",
+          "key": "recurrence",
+          "acceptedKeys": [],
+          "description": "Optional repeat rule. Requires `frequency` (`daily`, `weekly`, `monthly`, or `yearly`) and accepts `interval`, plus either `count` or `until` (never both) to set how long it repeats. Use `weekdays`, `monthDays`, `months`, `yearDays`, `weekNumbers`, `setPositions`, and `weekStart` to narrow which occurrences repeat, and `regenerate` on tasks to repeat from the due or completion date. Omit `recurrence` to create a one-off item. A task needs a due date before it can repeat.",
+          "required": false,
+          "schema": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "frequency"
+            ],
+            "properties": {
+              "frequency": {
+                "type": "string",
+                "enum": [
+                  "daily",
+                  "weekly",
+                  "monthly",
+                  "yearly"
+                ]
+              },
+              "interval": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "count": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "until": {
+                "type": "string",
+                "format": "busycal-date"
+              },
+              "untilTimeZoneIdentifier": {
+                "type": "string"
+              },
+              "weekdays": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "day"
+                  ],
+                  "properties": {
+                    "day": {
+                      "type": "string",
+                      "enum": [
+                        "sunday",
+                        "monday",
+                        "tuesday",
+                        "wednesday",
+                        "thursday",
+                        "friday",
+                        "saturday"
+                      ]
+                    },
+                    "ordinal": {
+                      "type": "integer",
+                      "not": {
+                        "const": 0
+                      }
+                    }
+                  }
+                }
+              },
+              "monthDays": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "not": {
+                    "const": 0
+                  },
+                  "minimum": -31,
+                  "maximum": 31
+                }
+              },
+              "months": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 12
+                }
+              },
+              "yearDays": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "not": {
+                    "const": 0
+                  },
+                  "minimum": -366,
+                  "maximum": 366
+                }
+              },
+              "weekNumbers": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "not": {
+                    "const": 0
+                  },
+                  "minimum": -53,
+                  "maximum": 53
+                }
+              },
+              "setPositions": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "not": {
+                    "const": 0
+                  },
+                  "minimum": -366,
+                  "maximum": 366
+                }
+              },
+              "weekStart": {
+                "type": "string",
+                "enum": [
+                  "sunday",
+                  "monday",
+                  "tuesday",
+                  "wednesday",
+                  "thursday",
+                  "friday",
+                  "saturday"
+                ]
+              },
+              "regenerate": {
+                "type": "string",
+                "enum": [
+                  "fromDueDateSkippingOverdue",
+                  "fromDueDate",
+                  "fromCompletionDate"
+                ]
+              }
+            },
+            "allOf": [
+              {
+                "not": {
+                  "required": [
+                    "count",
+                    "until"
+                  ]
+                }
+              },
+              {
+                "if": {
+                  "required": [
+                    "untilTimeZoneIdentifier"
+                  ]
+                },
+                "then": {
+                  "required": [
+                    "until"
+                  ]
+                }
+              }
+            ]
+          },
+          "transport": null
+        },
+        {
+          "name": "notes",
+          "key": "notes",
+          "acceptedKeys": [],
+          "description": "Optional event notes.",
+          "required": false,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        }
+      ]
+    },
+    {
+      "commandName": "createTask",
+      "toolName": "create_task",
+      "title": "Create BusyCal Task",
+      "description": "Create a new task in BusyCal. Requires a title. Supports optional due date, durationMinutes, reminders, calendar selection, notes, task priority, BusyCal starred status, and an explicit IANA time zone identifier. Use a date-only `dueDate` such as `2026-04-14` to create an all-day task on that day; include a time only when the user wants a timed task. To place a timed task in a specific time zone, send an unzoned wall-clock `dueDate` (no offset) together with `dueTimeZoneIdentifier`. Omit the due date to create an undated task. Omit `priority` to use BusyCal's configured default; use `none` to create the task with no priority. Only include `alarms` when the user explicitly asked for reminders.",
+      "resultDescription": "Created task record, including durationMinutes. Zero means no custom duration.",
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "parameters": [
+        {
+          "name": "title",
+          "key": "title",
+          "acceptedKeys": [],
+          "description": "Task title.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        },
+        {
+          "name": "dueDate",
+          "key": "dueDate",
+          "acceptedKeys": [],
+          "description": "Optional task due date/time. A date-only value like `2026-04-14` creates an all-day task due that day. For timed input, send an unzoned wall-clock string and pair it with `dueTimeZoneIdentifier` when the task should use a specific named time zone.",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "format": "busycal-date"
+          },
+          "transport": null
+        },
+        {
+          "name": "dueTimeZoneIdentifier",
+          "key": "dueTimeZoneIdentifier",
+          "acceptedKeys": [],
+          "description": "IANA time zone identifier for the timed `dueDate`, such as `America/Los_Angeles`. When present, the `dueDate` string must be an unzoned wall-clock value (no offset). Requires `dueDate`. Omit to use BusyCal's current app time zone.",
+          "required": false,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        },
+        {
+          "name": "durationMinutes",
+          "key": "durationMinutes",
+          "acceptedKeys": [],
+          "description": "Optional task duration in whole minutes, such as 30 or 60. Omit or use 0 for no custom duration. Requires calendar support for task durations or BusyCal's extended task properties setting. Todoist tasks need a due date and time.",
+          "required": false,
+          "schema": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "transport": null
+        },
+        {
+          "name": "calendarID",
+          "key": "calendarID",
+          "acceptedKeys": [],
+          "description": "Optional target calendar identifier.",
+          "required": false,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        },
+        {
+          "name": "priority",
+          "key": "priority",
+          "acceptedKeys": [],
+          "description": "Optional task priority. Use `none`, `low`, `medium`, or `high`. Omit this field to use BusyCal's configured default priority; use `none` to create the task with no priority.",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "none",
+              "low",
+              "medium",
+              "high"
+            ]
+          },
+          "transport": null
+        },
+        {
+          "name": "isStarred",
+          "key": "isStarred",
+          "acceptedKeys": [],
+          "description": "Optional BusyCal starred state. Set true to star the task or false to leave it unstarred. Omit this field to use the normal default state.",
+          "required": false,
+          "schema": {
+            "type": "boolean"
+          },
+          "transport": null
+        },
+        {
+          "name": "alarms",
+          "key": "alarms",
+          "acceptedKeys": [],
+          "description": "Optional list of signed relative reminder minutes. Include this field only when the user explicitly requested reminders. Use `[]` to create the task with no reminders. Omit `alarms` so BusyCal keeps its own defaults. Tasks with no due date cannot accept non-empty alarm lists.",
+          "required": false,
+          "schema": {
+            "type": "array",
+            "maxItems": 4,
+            "items": {
+              "type": "integer"
+            }
+          },
+          "transport": null
+        },
+        {
+          "name": "recurrence",
+          "key": "recurrence",
+          "acceptedKeys": [],
+          "description": "Optional repeat rule. Requires `frequency` (`daily`, `weekly`, `monthly`, or `yearly`) and accepts `interval`, plus either `count` or `until` (never both) to set how long it repeats. Use `weekdays`, `monthDays`, `months`, `yearDays`, `weekNumbers`, `setPositions`, and `weekStart` to narrow which occurrences repeat, and `regenerate` on tasks to repeat from the due or completion date. Omit `recurrence` to create a one-off item. A task needs a due date before it can repeat.",
+          "required": false,
+          "schema": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "frequency"
+            ],
+            "properties": {
+              "frequency": {
+                "type": "string",
+                "enum": [
+                  "daily",
+                  "weekly",
+                  "monthly",
+                  "yearly"
+                ]
+              },
+              "interval": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "count": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "until": {
+                "type": "string",
+                "format": "busycal-date"
+              },
+              "untilTimeZoneIdentifier": {
+                "type": "string"
+              },
+              "weekdays": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "day"
+                  ],
+                  "properties": {
+                    "day": {
+                      "type": "string",
+                      "enum": [
+                        "sunday",
+                        "monday",
+                        "tuesday",
+                        "wednesday",
+                        "thursday",
+                        "friday",
+                        "saturday"
+                      ]
+                    },
+                    "ordinal": {
+                      "type": "integer",
+                      "not": {
+                        "const": 0
+                      }
+                    }
+                  }
+                }
+              },
+              "monthDays": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "not": {
+                    "const": 0
+                  },
+                  "minimum": -31,
+                  "maximum": 31
+                }
+              },
+              "months": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 12
+                }
+              },
+              "yearDays": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "not": {
+                    "const": 0
+                  },
+                  "minimum": -366,
+                  "maximum": 366
+                }
+              },
+              "weekNumbers": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "not": {
+                    "const": 0
+                  },
+                  "minimum": -53,
+                  "maximum": 53
+                }
+              },
+              "setPositions": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "not": {
+                    "const": 0
+                  },
+                  "minimum": -366,
+                  "maximum": 366
+                }
+              },
+              "weekStart": {
+                "type": "string",
+                "enum": [
+                  "sunday",
+                  "monday",
+                  "tuesday",
+                  "wednesday",
+                  "thursday",
+                  "friday",
+                  "saturday"
+                ]
+              },
+              "regenerate": {
+                "type": "string",
+                "enum": [
+                  "fromDueDateSkippingOverdue",
+                  "fromDueDate",
+                  "fromCompletionDate"
+                ]
+              }
+            },
+            "allOf": [
+              {
+                "not": {
+                  "required": [
+                    "count",
+                    "until"
+                  ]
+                }
+              },
+              {
+                "if": {
+                  "required": [
+                    "untilTimeZoneIdentifier"
+                  ]
+                },
+                "then": {
+                  "required": [
+                    "until"
+                  ]
+                }
+              }
+            ]
+          },
+          "transport": null
+        },
+        {
+          "name": "notes",
+          "key": "notes",
+          "acceptedKeys": [],
+          "description": "Optional task notes.",
+          "required": false,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        }
+      ]
+    },
+    {
+      "commandName": "createTaskCalendar",
+      "toolName": "create_task_calendar",
+      "title": "Create BusyCal Task Calendar",
+      "description": "Create a new task calendar (task list) in BusyCal. Pass the calendar name in `name`, which must be 1 to 32 characters. There is no account parameter: BusyCal creates the calendar on the remote account that owns its default task calendar, and rejects local accounts and accounts that cannot create calendars.",
+      "resultDescription": "Created task calendar record.",
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "parameters": [
+        {
+          "name": "name",
+          "key": "name",
+          "acceptedKeys": [
+            "title"
+          ],
+          "description": "Name for the new task calendar, 1 to 32 characters. Required; `title` is accepted as an alias.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        }
+      ]
+    },
+    {
+      "commandName": "duplicateItem",
+      "toolName": "duplicate_item",
+      "title": "Duplicate BusyCal Item",
+      "description": "Duplicate a BusyCal event or task. Creates a new copy of the item using BusyCal's edit pipeline. Omit `calendarID` to duplicate onto the source calendar. For recurring items, scope defaults to `one` (only the selected occurrence), unlike other commands which default to `all`.",
+      "resultDescription": "Duplicated item record.",
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "parameters": [
+        {
+          "name": "itemID",
+          "key": "itemID",
+          "acceptedKeys": [
+            "id"
+          ],
+          "description": "Canonical occurrence identifier of the item to duplicate, as returned by BusyCal query tools.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        },
+        {
+          "name": "calendarID",
+          "key": "calendarID",
+          "acceptedKeys": [],
+          "description": "Optional destination calendar identifier from `list_calendars`. Omit to duplicate onto the source calendar.",
+          "required": false,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        },
+        {
+          "name": "scope",
+          "key": "scope",
+          "acceptedKeys": [],
+          "description": "Recurrence scope: `one` duplicates only this occurrence, `future` duplicates this and all future occurrences, `all` duplicates the entire series. Defaults to `one`.",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "one",
+              "future",
+              "all"
+            ]
+          },
+          "transport": null
+        }
+      ]
+    },
+    {
+      "commandName": "openItem",
+      "toolName": "open_item",
+      "title": "Open BusyCal Item",
+      "description": "Reveal an existing BusyCal event or task in the BusyCal app using its canonical occurrence identifier. Use the `id` returned by BusyCal query tools when you want BusyCal to focus a specific result.",
+      "resultDescription": "Revealed item record.",
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "parameters": [
+        {
+          "name": "itemID",
+          "key": "itemID",
+          "acceptedKeys": [
+            "id"
+          ],
+          "description": "Canonical occurrence identifier returned by BusyCal query tools, such as `query_items`, `query_events`, or `query_tasks`.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        }
+      ]
+    },
+    {
+      "commandName": "moveItem",
+      "toolName": "move_item",
+      "title": "Move BusyCal Item",
+      "description": "Move a BusyCal event or task to a different calendar. The destination in `calendarID` must be writable and must support the item's type. For recurring items, `scope` defaults to `one` (only the selected occurrence), unlike most commands which default to `all`; tasks always move as a single item because recurring tasks never detach. The returned record can carry a new `id` when the move changes the occurrence identity.",
+      "resultDescription": "Moved item record. A moved occurrence can carry a new identifier.",
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "parameters": [
+        {
+          "name": "itemID",
+          "key": "itemID",
+          "acceptedKeys": [
+            "id"
+          ],
+          "description": "Canonical occurrence identifier of the item, as returned by BusyCal query tools.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        },
+        {
+          "name": "calendarID",
+          "key": "calendarID",
+          "acceptedKeys": [],
+          "description": "Destination calendar identifier from `list_calendars`. Required, and the calendar must be writable and support the item's type.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        },
+        {
+          "name": "scope",
+          "key": "scope",
+          "acceptedKeys": [],
+          "description": "Recurrence scope: `one` moves only this occurrence, `future` moves this and all future occurrences, `all` moves the entire series. Defaults to `one` when omitted. Tasks always move as a single item.",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "one",
+              "future",
+              "all"
+            ]
+          },
+          "transport": null
+        }
+      ]
+    },
+    {
+      "commandName": "moveEvent",
+      "toolName": "move_event",
+      "title": "Move BusyCal Event",
+      "description": "Reschedule a BusyCal event to a new start date and time. The original duration is preserved. To move an event into a specific time zone, send an unzoned wall-clock `startDate` (no offset) together with `startTimeZoneIdentifier`. Omit the timezone identifier to use BusyCal's current app time zone. Use scope to control whether the change applies to one occurrence, future occurrences, or the entire series.",
+      "resultDescription": "Updated event record.",
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "parameters": [
+        {
+          "name": "itemID",
+          "key": "itemID",
+          "acceptedKeys": [
+            "id"
+          ],
+          "description": "Occurrence-level event identifier.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        },
+        {
+          "name": "scope",
+          "key": "scope",
+          "acceptedKeys": [],
+          "description": "Recurrence scope: one, future, or all.",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "one",
+              "future",
+              "all"
+            ]
+          },
+          "transport": null
+        },
+        {
+          "name": "startDate",
+          "key": "startDate",
+          "acceptedKeys": [],
+          "description": "Required new event start date/time. For timed input, use an unzoned wall-clock string and pair it with `startTimeZoneIdentifier` when the destination should use a specific named time zone.",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "busycal-date"
+          },
+          "transport": null
+        },
+        {
+          "name": "startTimeZoneIdentifier",
+          "key": "startTimeZoneIdentifier",
+          "acceptedKeys": [],
+          "description": "IANA time zone identifier for the timed `startDate`, such as `America/Los_Angeles` or `US/Eastern`. When present, the `startDate` string must be an unzoned wall-clock value (no offset). Omit to use BusyCal's current app time zone.",
+          "required": false,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        }
+      ]
+    },
+    {
+      "commandName": "rescheduleEvent",
+      "toolName": "reschedule_event",
+      "title": "Reschedule BusyCal Event",
+      "description": "Change a BusyCal event's schedule through `startDate`, `endDate`, `allDay`, and the matching time zone identifiers. Send at least one of `startDate`, `endDate`, or `allDay`; omitted fields stay unchanged. `startDate` and `endDate` must use the same time style, and for an all-day event a date-only `endDate` is the inclusive final day. `scope` defaults to `all` (the entire series) when omitted, unlike `move_item`, which defaults to `one`.",
+      "resultDescription": "Updated event record. For a recurring event this is the detached occurrence, the new future series, or the master, according to scope.",
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "parameters": [
+        {
+          "name": "itemID",
+          "key": "itemID",
+          "acceptedKeys": [
+            "id"
+          ],
+          "description": "Canonical occurrence identifier of the event, as returned by BusyCal query tools.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        },
+        {
+          "name": "scope",
+          "key": "scope",
+          "acceptedKeys": [],
+          "description": "Recurrence scope: `one` changes only this occurrence, `future` changes this and all future occurrences, `all` changes the entire series. Defaults to `all` when omitted.",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "one",
+              "future",
+              "all"
+            ]
+          },
+          "transport": null
+        },
+        {
+          "name": "startDate",
+          "key": "startDate",
+          "acceptedKeys": [],
+          "description": "Optional new event start date/time. For timed input, use an unzoned wall-clock string and pair it with `startTimeZoneIdentifier` when the event should use a specific named time zone. Omit `startDate` to leave the current start unchanged.",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "format": "busycal-date"
+          },
+          "transport": null
+        },
+        {
+          "name": "endDate",
+          "key": "endDate",
+          "acceptedKeys": [],
+          "description": "Optional new event end date/time. For an all-day event, a date-only value such as `2026-04-14` is the inclusive final day. An end before the start is rejected. Omit `endDate` to leave the current end unchanged.",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "format": "busycal-date"
+          },
+          "transport": null
+        },
+        {
+          "name": "allDay",
+          "key": "allDay",
+          "acceptedKeys": [],
+          "description": "Optional all-day state. Set true to make the event all-day or false to make it timed; converting to timed without new times keeps the day and applies BusyCal's default duration and floating-time preference. Omit `allDay` to leave the current state unchanged.",
+          "required": false,
+          "schema": {
+            "type": "boolean"
+          },
+          "transport": null
+        },
+        {
+          "name": "startTimeZoneIdentifier",
+          "key": "startTimeZoneIdentifier",
+          "acceptedKeys": [],
+          "description": "IANA time zone identifier for the timed `startDate`, such as `America/Los_Angeles`. When present, the `startDate` string must be an unzoned wall-clock value (no offset), and all-day events do not accept it. Requires `startDate`. Omit to use BusyCal's current app time zone.",
+          "required": false,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        },
+        {
+          "name": "endTimeZoneIdentifier",
+          "key": "endTimeZoneIdentifier",
+          "acceptedKeys": [],
+          "description": "IANA time zone identifier for the timed `endDate`, such as `America/New_York`. When present, the `endDate` string must be an unzoned wall-clock value (no offset), and all-day events do not accept it. Requires `endDate`. Omit to use BusyCal's current app time zone.",
+          "required": false,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        }
+      ]
+    },
+    {
+      "commandName": "deferTask",
+      "toolName": "defer_task",
+      "title": "Defer BusyCal Task",
+      "description": "Change a BusyCal task's due date. Omit the due date to make the task undated. To set a timed due date in a specific time zone, send an unzoned wall-clock `dueDate` (no offset) together with `dueTimeZoneIdentifier`. Omit the timezone identifier to use BusyCal's current app time zone. Use scope to control whether the change applies to one occurrence, future occurrences, or the entire series.",
+      "resultDescription": "Updated task record.",
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "parameters": [
+        {
+          "name": "itemID",
+          "key": "itemID",
+          "acceptedKeys": [
+            "id"
+          ],
+          "description": "Occurrence-level task identifier.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        },
+        {
+          "name": "scope",
+          "key": "scope",
+          "acceptedKeys": [],
+          "description": "Recurrence scope: one, future, or all.",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "one",
+              "future",
+              "all"
+            ]
+          },
+          "transport": null
+        },
+        {
+          "name": "dueDate",
+          "key": "dueDate",
+          "acceptedKeys": [],
+          "description": "Optional new task due date/time. For timed input, use an unzoned wall-clock string and pair it with `dueTimeZoneIdentifier` when the due date should use a specific named time zone.",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "format": "busycal-date"
+          },
+          "transport": null
+        },
+        {
+          "name": "dueTimeZoneIdentifier",
+          "key": "dueTimeZoneIdentifier",
+          "acceptedKeys": [],
+          "description": "IANA time zone identifier for the timed `dueDate`, such as `America/Los_Angeles`. When present, the `dueDate` string must be an unzoned wall-clock value (no offset). Requires `dueDate`. Omit to use BusyCal's current app time zone.",
+          "required": false,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        }
+      ]
+    },
+    {
+      "commandName": "completeTask",
+      "toolName": "complete_task",
+      "title": "Complete BusyCal Task",
+      "description": "Mark a BusyCal task as complete. Optionally provide a completion timestamp. Use scope to control whether the change applies to one occurrence, future occurrences, or the entire series.",
+      "resultDescription": "Updated task record.",
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "parameters": [
+        {
+          "name": "itemID",
+          "key": "itemID",
+          "acceptedKeys": [
+            "id"
+          ],
+          "description": "Occurrence-level task identifier.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        },
+        {
+          "name": "scope",
+          "key": "scope",
+          "acceptedKeys": [],
+          "description": "Recurrence scope: one, future, or all.",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "one",
+              "future",
+              "all"
+            ]
+          },
+          "transport": null
+        },
+        {
+          "name": "completedAt",
+          "key": "completedAt",
+          "acceptedKeys": [],
+          "description": "Optional completion timestamp.",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "format": "busycal-date"
+          },
+          "transport": null
+        }
+      ]
+    },
+    {
+      "commandName": "uncompleteTask",
+      "toolName": "uncomplete_task",
+      "title": "Reopen BusyCal Task",
+      "description": "Mark a completed BusyCal task as not completed. Use scope to control whether the change applies to one occurrence, future occurrences, or the entire series.",
+      "resultDescription": "Updated task record.",
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "parameters": [
+        {
+          "name": "itemID",
+          "key": "itemID",
+          "acceptedKeys": [
+            "id"
+          ],
+          "description": "Occurrence-level task identifier.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        },
+        {
+          "name": "scope",
+          "key": "scope",
+          "acceptedKeys": [],
+          "description": "Recurrence scope: one, future, or all.",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "one",
+              "future",
+              "all"
+            ]
+          },
+          "transport": null
+        }
+      ]
+    },
+    {
+      "commandName": "updateEvent",
+      "toolName": "update_event",
+      "title": "Update BusyCal Event",
+      "description": "Update a BusyCal event's title, location, travel time, notes, shared tags, My Tags, item URLs, or reminders. Provide at least one field to change. Omit a field to leave it unchanged. Use scope to control whether the change applies to one occurrence, future occurrences, or the entire series.",
+      "resultDescription": "Updated event record.",
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "parameters": [
+        {
+          "name": "itemID",
+          "key": "itemID",
+          "acceptedKeys": [
+            "id"
+          ],
+          "description": "Occurrence-level event identifier.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        },
+        {
+          "name": "scope",
+          "key": "scope",
+          "acceptedKeys": [],
+          "description": "Recurrence scope: one, future, or all.",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "one",
+              "future",
+              "all"
+            ]
+          },
+          "transport": null
+        },
+        {
+          "name": "title",
+          "key": "title",
+          "acceptedKeys": [],
+          "description": "Optional replacement title.",
+          "required": false,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        },
+        {
+          "name": "location",
+          "key": "location",
+          "acceptedKeys": [],
+          "description": "Replacement location string. Omit to leave unchanged. Pass an empty string to clear it.",
+          "required": false,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        },
+        {
+          "name": "travelTime",
+          "key": "travelTime",
+          "acceptedKeys": [],
+          "description": "Replacement travel time in whole minutes before the event starts. Use 0 to clear it, or omit this field to leave it unchanged. All-day events and Apple Calendar accounts do not support this field.",
+          "required": false,
+          "schema": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "transport": null
+        },
+        {
+          "name": "url",
+          "key": "url",
+          "acceptedKeys": [],
+          "description": "Replacement item URL. Omit to leave unchanged. Pass an empty string to clear it.",
+          "required": false,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        },
+        {
+          "name": "locationURL",
+          "key": "locationURL",
+          "acceptedKeys": [],
+          "description": "Replacement location URL. Omit to leave unchanged. Pass an empty string to clear it.",
+          "required": false,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        },
+        {
+          "name": "tags",
+          "key": "tags",
+          "acceptedKeys": [],
+          "description": "Replacement comma-separated shared tags (e.g. \"work, planning\"). Omit to leave unchanged. Pass an empty string to clear all shared tags.",
+          "required": false,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        },
+        {
+          "name": "myTags",
+          "key": "myTags",
+          "acceptedKeys": [],
+          "description": "Replacement comma-separated My Tags (e.g. \"personal, priority\"). Omit to leave unchanged. Pass an empty string to clear all My Tags.",
+          "required": false,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        },
+        {
+          "name": "alarms",
+          "key": "alarms",
+          "acceptedKeys": [],
+          "description": "Optional list of signed relative reminder minutes. Omit to leave reminders unchanged. Pass an empty array to clear all reminders.",
+          "required": false,
+          "schema": {
+            "type": "array",
+            "maxItems": 4,
+            "items": {
+              "type": "integer"
+            }
+          },
+          "transport": null
+        },
+        {
+          "name": "recurrence",
+          "key": "recurrence",
+          "acceptedKeys": [],
+          "description": "Replacement repeat rule, using the same fields as when creating an item. Omit `recurrence` to leave the current repeat unchanged, or pass `null` to stop the item repeating. Recurring events follow `scope`, while a task's repeat rule always applies to that task alone and requires `scope: one`.",
+          "required": false,
+          "schema": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "frequency"
+                ],
+                "properties": {
+                  "frequency": {
+                    "type": "string",
+                    "enum": [
+                      "daily",
+                      "weekly",
+                      "monthly",
+                      "yearly"
+                    ]
+                  },
+                  "interval": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "count": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "until": {
+                    "type": "string",
+                    "format": "busycal-date"
+                  },
+                  "untilTimeZoneIdentifier": {
+                    "type": "string"
+                  },
+                  "weekdays": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "day"
+                      ],
+                      "properties": {
+                        "day": {
+                          "type": "string",
+                          "enum": [
+                            "sunday",
+                            "monday",
+                            "tuesday",
+                            "wednesday",
+                            "thursday",
+                            "friday",
+                            "saturday"
+                          ]
+                        },
+                        "ordinal": {
+                          "type": "integer",
+                          "not": {
+                            "const": 0
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "monthDays": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "not": {
+                        "const": 0
+                      },
+                      "minimum": -31,
+                      "maximum": 31
+                    }
+                  },
+                  "months": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 12
+                    }
+                  },
+                  "yearDays": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "not": {
+                        "const": 0
+                      },
+                      "minimum": -366,
+                      "maximum": 366
+                    }
+                  },
+                  "weekNumbers": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "not": {
+                        "const": 0
+                      },
+                      "minimum": -53,
+                      "maximum": 53
+                    }
+                  },
+                  "setPositions": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "not": {
+                        "const": 0
+                      },
+                      "minimum": -366,
+                      "maximum": 366
+                    }
+                  },
+                  "weekStart": {
+                    "type": "string",
+                    "enum": [
+                      "sunday",
+                      "monday",
+                      "tuesday",
+                      "wednesday",
+                      "thursday",
+                      "friday",
+                      "saturday"
+                    ]
+                  },
+                  "regenerate": {
+                    "type": "string",
+                    "enum": [
+                      "fromDueDateSkippingOverdue",
+                      "fromDueDate",
+                      "fromCompletionDate"
+                    ]
+                  }
+                },
+                "allOf": [
+                  {
+                    "not": {
+                      "required": [
+                        "count",
+                        "until"
+                      ]
+                    }
+                  },
+                  {
+                    "if": {
+                      "required": [
+                        "untilTimeZoneIdentifier"
+                      ]
+                    },
+                    "then": {
+                      "required": [
+                        "until"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "transport": null
+        },
+        {
+          "name": "notes",
+          "key": "notes",
+          "acceptedKeys": [],
+          "description": "Replacement notes text. Omit to leave unchanged. Pass an empty string to clear it.",
+          "required": false,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        }
+      ]
+    },
+    {
+      "commandName": "updateTask",
+      "toolName": "update_task",
+      "title": "Update BusyCal Task",
+      "description": "Update a BusyCal task's title, notes, shared tags, My Tags, item URLs, reminders, durationMinutes, priority, or BusyCal starred status. Provide at least one field to change. Omit a field to leave it unchanged. Use `priority: none` to clear priority or `durationMinutes: 0` to clear a custom duration. Changes to a repeating task apply to that task only, so send `scope: one` for duration, priority, and starred changes on one; scope otherwise defaults to `all`.",
+      "resultDescription": "Updated task record, including durationMinutes. Zero means no custom duration.",
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "parameters": [
+        {
+          "name": "itemID",
+          "key": "itemID",
+          "acceptedKeys": [
+            "id"
+          ],
+          "description": "Occurrence-level task identifier.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        },
+        {
+          "name": "scope",
+          "key": "scope",
+          "acceptedKeys": [],
+          "description": "Recurrence scope. Defaults to `all`. Changes to a repeating task apply to that task only, so duration, priority, and starred changes on one need `scope: one`.",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "one",
+              "future",
+              "all"
+            ]
+          },
+          "transport": null
+        },
+        {
+          "name": "title",
+          "key": "title",
+          "acceptedKeys": [],
+          "description": "Optional replacement title.",
+          "required": false,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        },
+        {
+          "name": "priority",
+          "key": "priority",
+          "acceptedKeys": [],
+          "description": "Replacement task priority. Use `none`, `low`, `medium`, or `high`. Omit to leave unchanged; use `none` to clear priority. On a repeating task this applies to that task only, so send `scope: one`.",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "none",
+              "low",
+              "medium",
+              "high"
+            ]
+          },
+          "transport": null
+        },
+        {
+          "name": "isStarred",
+          "key": "isStarred",
+          "acceptedKeys": [],
+          "description": "Replacement BusyCal starred state. Set true to star or false to unstar. Omit to leave unchanged. On a repeating task this applies to that task only, so send `scope: one`.",
+          "required": false,
+          "schema": {
+            "type": "boolean"
+          },
+          "transport": null
+        },
+        {
+          "name": "durationMinutes",
+          "key": "durationMinutes",
+          "acceptedKeys": [],
+          "description": "Replacement task duration in whole minutes. Omit to leave unchanged; 0 clears the custom duration. Requires calendar support for task durations or BusyCal's extended task properties setting. Todoist tasks need a due date and time. On a repeating task, send `scope: one`.",
+          "required": false,
+          "schema": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "transport": null
+        },
+        {
+          "name": "url",
+          "key": "url",
+          "acceptedKeys": [],
+          "description": "Replacement item URL. Omit to leave unchanged. Pass an empty string to clear it.",
+          "required": false,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        },
+        {
+          "name": "locationURL",
+          "key": "locationURL",
+          "acceptedKeys": [],
+          "description": "Replacement location URL. Omit to leave unchanged. Pass an empty string to clear it.",
+          "required": false,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        },
+        {
+          "name": "tags",
+          "key": "tags",
+          "acceptedKeys": [],
+          "description": "Replacement comma-separated shared tags (e.g. \"work, planning\"). Omit to leave unchanged. Pass an empty string to clear all shared tags.",
+          "required": false,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        },
+        {
+          "name": "myTags",
+          "key": "myTags",
+          "acceptedKeys": [],
+          "description": "Replacement comma-separated My Tags (e.g. \"personal, priority\"). Omit to leave unchanged. Pass an empty string to clear all My Tags.",
+          "required": false,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        },
+        {
+          "name": "alarms",
+          "key": "alarms",
+          "acceptedKeys": [],
+          "description": "Optional list of signed relative reminder minutes. Omit to leave reminders unchanged. Pass an empty array to clear all reminders.",
+          "required": false,
+          "schema": {
+            "type": "array",
+            "maxItems": 4,
+            "items": {
+              "type": "integer"
+            }
+          },
+          "transport": null
+        },
+        {
+          "name": "recurrence",
+          "key": "recurrence",
+          "acceptedKeys": [],
+          "description": "Replacement repeat rule, using the same fields as when creating an item. Omit `recurrence` to leave the current repeat unchanged, or pass `null` to stop the item repeating. Recurring events follow `scope`, while a task's repeat rule always applies to that task alone and requires `scope: one`.",
+          "required": false,
+          "schema": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "frequency"
+                ],
+                "properties": {
+                  "frequency": {
+                    "type": "string",
+                    "enum": [
+                      "daily",
+                      "weekly",
+                      "monthly",
+                      "yearly"
+                    ]
+                  },
+                  "interval": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "count": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "until": {
+                    "type": "string",
+                    "format": "busycal-date"
+                  },
+                  "untilTimeZoneIdentifier": {
+                    "type": "string"
+                  },
+                  "weekdays": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "day"
+                      ],
+                      "properties": {
+                        "day": {
+                          "type": "string",
+                          "enum": [
+                            "sunday",
+                            "monday",
+                            "tuesday",
+                            "wednesday",
+                            "thursday",
+                            "friday",
+                            "saturday"
+                          ]
+                        },
+                        "ordinal": {
+                          "type": "integer",
+                          "not": {
+                            "const": 0
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "monthDays": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "not": {
+                        "const": 0
+                      },
+                      "minimum": -31,
+                      "maximum": 31
+                    }
+                  },
+                  "months": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 12
+                    }
+                  },
+                  "yearDays": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "not": {
+                        "const": 0
+                      },
+                      "minimum": -366,
+                      "maximum": 366
+                    }
+                  },
+                  "weekNumbers": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "not": {
+                        "const": 0
+                      },
+                      "minimum": -53,
+                      "maximum": 53
+                    }
+                  },
+                  "setPositions": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "not": {
+                        "const": 0
+                      },
+                      "minimum": -366,
+                      "maximum": 366
+                    }
+                  },
+                  "weekStart": {
+                    "type": "string",
+                    "enum": [
+                      "sunday",
+                      "monday",
+                      "tuesday",
+                      "wednesday",
+                      "thursday",
+                      "friday",
+                      "saturday"
+                    ]
+                  },
+                  "regenerate": {
+                    "type": "string",
+                    "enum": [
+                      "fromDueDateSkippingOverdue",
+                      "fromDueDate",
+                      "fromCompletionDate"
+                    ]
+                  }
+                },
+                "allOf": [
+                  {
+                    "not": {
+                      "required": [
+                        "count",
+                        "until"
+                      ]
+                    }
+                  },
+                  {
+                    "if": {
+                      "required": [
+                        "untilTimeZoneIdentifier"
+                      ]
+                    },
+                    "then": {
+                      "required": [
+                        "until"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "transport": null
+        },
+        {
+          "name": "notes",
+          "key": "notes",
+          "acceptedKeys": [],
+          "description": "Replacement notes text. Omit to leave unchanged. Pass an empty string to clear it.",
+          "required": false,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        }
+      ]
+    },
+    {
+      "commandName": "deleteEvent",
+      "toolName": "delete_event",
+      "title": "Delete BusyCal Event",
+      "description": "Delete a BusyCal event. Use scope to delete one occurrence, future occurrences, or the entire recurring series.",
+      "resultDescription": "Deletion record.",
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "parameters": [
+        {
+          "name": "itemID",
+          "key": "itemID",
+          "acceptedKeys": [
+            "id"
+          ],
+          "description": "Occurrence-level event identifier.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        },
+        {
+          "name": "scope",
+          "key": "scope",
+          "acceptedKeys": [],
+          "description": "Recurrence scope: one, future, or all.",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "one",
+              "future",
+              "all"
+            ]
+          },
+          "transport": null
+        }
+      ]
+    },
+    {
+      "commandName": "deleteTask",
+      "toolName": "delete_task",
+      "title": "Delete BusyCal Task",
+      "description": "Delete a BusyCal task. Use scope to delete one occurrence, future occurrences, or the entire recurring series.",
+      "resultDescription": "Deletion record.",
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "parameters": [
+        {
+          "name": "itemID",
+          "key": "itemID",
+          "acceptedKeys": [
+            "id"
+          ],
+          "description": "Occurrence-level task identifier.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "transport": null
+        },
+        {
+          "name": "scope",
+          "key": "scope",
+          "acceptedKeys": [],
+          "description": "Recurrence scope: one, future, or all.",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "one",
+              "future",
+              "all"
+            ]
+          },
+          "transport": null
+        }
+      ]
+    }
+  ]
+}

@@ -1,2 +1,3 @@
 *.mcpb
 dist/
+.DS_Store

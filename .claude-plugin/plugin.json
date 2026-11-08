@@ -1,0 +1,23 @@
+{
+  "name": "busycal",
+  "displayName": "BusyCal",
+  "version": "1.2.1",
+  "description": "Manage your calendars, events, tasks, and availability in BusyCal.",
+  "author": {
+    "name": "Beehive Innovations",
+    "url": "https://www.busymac.com/about/"
+  },
+  "homepage": "https://www.busymac.com/busycal/",
+  "repository": "https://github.com/BeehiveInnovations/busycal-mcpb",
+  "keywords": [
+    "busycal",
+    "calendar",
+    "task management",
+    "scheduling",
+    "availability"
+  ],
+  "icon": "./assets/busycal-icon.png",
+  "documentationUrl": "https://www.busymac.com/docs/busycal/70624-mcp",
+  "supportUrl": "https://www.busymac.com/docs/",
+  "privacyPolicyUrl": "https://www.busymac.com/privacy"
+}
