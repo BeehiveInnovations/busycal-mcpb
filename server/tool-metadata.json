@@ -29,7 +29,7 @@
       "commandName": "listCalendars",
       "toolName": "list_calendars",
       "title": "List BusyCal Calendars",
-      "description": "List the user's BusyCal calendars. Returns calendar names, IDs, and whether each supports events or tasks. Can filter by account and exclude subscription, holiday, or birthday calendars.",
+      "description": "List the user's BusyCal calendars. Returns calendar names, IDs, and whether each supports events or tasks. Includes WebDAV subscription, holiday, birthday, and anniversary calendars by default. Set `includeWebDAV`, `includeHolidayCalendars`, or `includeContactCalendars` to false to exclude those calendars. Can also filter by account.",
       "resultDescription": "Calendar records.",
       "annotations": {
         "readOnlyHint": true,
@@ -63,7 +63,7 @@
           "name": "includeWebDAV",
           "key": "includeWebDAV",
           "acceptedKeys": [],
-          "description": "Include WebDAV subscription calendars when true.",
+          "description": "Include WebDAV subscription calendars. Defaults to true; set false to exclude them.",
           "required": false,
           "schema": {
             "type": "boolean"
@@ -74,7 +74,7 @@
           "name": "includeContactCalendars",
           "key": "includeContactCalendars",
           "acceptedKeys": [],
-          "description": "Include birthday and anniversary calendars when true.",
+          "description": "Include birthday and anniversary calendars. Defaults to true; set false to exclude them.",
           "required": false,
           "schema": {
             "type": "boolean"
@@ -85,7 +85,7 @@
           "name": "includeHolidayCalendars",
           "key": "includeHolidayCalendars",
           "acceptedKeys": [],
-          "description": "Include holiday calendars when true.",
+          "description": "Include holiday calendars. Defaults to true; set false to exclude them.",
           "required": false,
           "schema": {
             "type": "boolean"
@@ -1174,7 +1174,7 @@
       "commandName": "createTask",
       "toolName": "create_task",
       "title": "Create BusyCal Task",
-      "description": "Create a new task in BusyCal. Requires a title. Supports optional due date, durationMinutes, reminders, calendar selection, notes, task priority, BusyCal starred status, and an explicit IANA time zone identifier. Use a date-only `dueDate` such as `2026-04-14` to create an all-day task on that day; include a time only when the user wants a timed task. To place a timed task in a specific time zone, send an unzoned wall-clock `dueDate` (no offset) together with `dueTimeZoneIdentifier`. Omit the due date to create an undated task. Omit `priority` to use BusyCal's configured default; use `none` to create the task with no priority. Only include `alarms` when the user explicitly asked for reminders.",
+      "description": "Create a new task in BusyCal. Requires a title. Supports optional due date, durationMinutes, reminders, calendar selection, notes, task priority, BusyCal starred status, and an explicit IANA time zone identifier. Use a date-only `dueDate` such as `2026-04-14` to create an all-day task on that day; include a time only when the user wants a timed task. All-day tasks return `isAllDay: true` with a noon UTC due-date anchor and `dueTimeZoneIdentifier: Universal`; this represents a calendar date, not a noon deadline. To place a timed task in a specific time zone, send an unzoned wall-clock `dueDate` (no offset) together with `dueTimeZoneIdentifier`. Omit the due date to create an undated task. Omit `priority` to use BusyCal's configured default; use `none` to create the task with no priority. Only include `alarms` when the user explicitly asked for reminders.",
       "resultDescription": "Created task record, including durationMinutes. Zero means no custom duration.",
       "annotations": {
         "readOnlyHint": false,
@@ -1631,7 +1631,7 @@
       "commandName": "moveEvent",
       "toolName": "move_event",
       "title": "Move BusyCal Event",
-      "description": "Reschedule a BusyCal event to a new start date and time. The original duration is preserved. To move an event into a specific time zone, send an unzoned wall-clock `startDate` (no offset) together with `startTimeZoneIdentifier`. Omit the timezone identifier to use BusyCal's current app time zone. Use scope to control whether the change applies to one occurrence, future occurrences, or the entire series.",
+      "description": "Reschedule a BusyCal event to a new start date and time. The original duration is preserved. Use the returned `id` for subsequent commands because moving the occurrence can change it. To move an event into a specific time zone, send an unzoned wall-clock `startDate` (no offset) together with `startTimeZoneIdentifier`. Omit the timezone identifier to use BusyCal's current app time zone. Use scope to control whether the change applies to one occurrence, future occurrences, or the entire series.",
       "resultDescription": "Updated event record.",
       "annotations": {
         "readOnlyHint": false,
@@ -1799,7 +1799,7 @@
       "commandName": "deferTask",
       "toolName": "defer_task",
       "title": "Defer BusyCal Task",
-      "description": "Change a BusyCal task's due date. Omit the due date to make the task undated. To set a timed due date in a specific time zone, send an unzoned wall-clock `dueDate` (no offset) together with `dueTimeZoneIdentifier`. Omit the timezone identifier to use BusyCal's current app time zone. Use scope to control whether the change applies to one occurrence, future occurrences, or the entire series.",
+      "description": "Change a BusyCal task's due date. Omit the due date to make the task undated. Changing an all-day task to a timed task replaces its existing reminders with BusyCal's enabled default timed-task reminders, or removes them if no timed-task default is enabled. To remove reminders afterward, call `update_task` with `alarms: []` and the `id` returned by this command. Always use the returned `id` for subsequent commands because changing the due date can change it. To set a timed due date in a specific time zone, send an unzoned wall-clock `dueDate` (no offset) together with `dueTimeZoneIdentifier`. Omit the timezone identifier to use BusyCal's current app time zone. Use scope to control whether the change applies to one occurrence, future occurrences, or the entire series.",
       "resultDescription": "Updated task record.",
       "annotations": {
         "readOnlyHint": false,
